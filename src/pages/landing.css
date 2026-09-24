@@ -1,0 +1,245 @@
+/* MAEX Trade landing page — fully scoped under .maex-page so nothing here can
+   leak into the app UI (both use generic class names like .stat/.container).
+   Fonts (Outfit, Plus Jakarta Sans, DM Mono) are loaded in index.html. */
+
+html { scroll-behavior: smooth; }
+
+.maex-page {
+  --app-font-sans: 'Plus Jakarta Sans', sans-serif;
+  --app-font-mono: 'DM Mono', monospace;
+  --app-font-display: 'Outfit', sans-serif;
+  min-height: 100dvh; overflow: hidden; background: #070a12;
+  color: #f2f0e9; font-family: var(--app-font-sans); -webkit-font-smoothing: antialiased;
+}
+.maex-page * { box-sizing: border-box; }
+.maex-page p, .maex-page span, .maex-page button, .maex-page input { font-family: var(--app-font-sans); }
+.maex-page h1, .maex-page h2, .maex-page h3, .maex-page h4, .maex-page h5, .maex-page h6, .maex-page .display { font-family: var(--app-font-display); }
+.maex-page button, .maex-page input { font: inherit; }
+.maex-page button, .maex-page a { -webkit-tap-highlight-color: transparent; }
+.maex-page a { color: inherit; text-decoration: none; }
+.maex-page [id] { scroll-margin-top: 92px; }
+
+.maex-page .container { width: min(1240px, calc(100% - 64px)); margin: 0 auto; }
+.maex-page .mono { font-family: var(--app-font-mono); }
+.maex-page .display { font-family: var(--app-font-display); letter-spacing: -.025em; }
+.maex-page .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: #c7ff42; font: 500 11px var(--app-font-mono); letter-spacing: .13em; text-transform: uppercase; }
+.maex-page .eyebrow::before { content: ''; width: 24px; height: 1px; background: #c7ff42; }
+.maex-page .muted { color: #9299a7; }
+
+.maex-page .site-header { position: fixed; inset: 0 0 auto; z-index: 30; border-bottom: 1px solid rgba(177,194,215,.11); background: rgba(7,10,18,.77); backdrop-filter: blur(18px); }
+.maex-page .nav-shell { height: 76px; display: flex; align-items: center; justify-content: space-between; }
+.maex-page .brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: .08em; font-size: 16px; }
+.maex-page .brand-mark { width: 24px; height: 24px; display: grid; place-items: center; color: #070a12; background: #c7ff42; clip-path: polygon(0 0, 100% 0, 100% 66%, 66% 66%, 66% 100%, 0 100%); font: 700 14px var(--app-font-display); }
+.maex-page .desktop-nav { display: flex; align-items: center; gap: 29px; margin-left: 9%; }
+.maex-page .nav-link { color: #9da5b4; font: 500 11px var(--app-font-mono); letter-spacing: .04em; transition: color .2s ease; }
+.maex-page .nav-link:hover { color: #f2f0e9; }
+.maex-page .nav-action { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; color: #070a12; background: #c7ff42; border: 1px solid #c7ff42; border-radius: 999px; font: 600 11px var(--app-font-display); text-transform: uppercase; letter-spacing: .05em; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.maex-page .nav-action:hover, .maex-page .button-primary:hover { transform: translateY(-2px); background: #dcff81; box-shadow: 0 10px 24px rgba(199,255,66,.2); }
+.maex-page .menu-button { display: none; color: #f2f0e9; border: 0; background: transparent; padding: 8px; }
+.maex-page .mobile-nav { display: none; }
+
+.maex-page .hero { position: relative; min-height: 690px; padding: 143px 0 74px; border-bottom: 1px solid rgba(177,194,215,.11); }
+.maex-page .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .42; background-image: linear-gradient(rgba(160,185,215,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(160,185,215,.06) 1px, transparent 1px); background-size: 80px 80px; mask-image: linear-gradient(to bottom, black, transparent 86%); }
+.maex-page .hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -110px; top: 50px; border: 1px solid rgba(199,255,66,.12); border-radius: 50%; box-shadow: 0 0 0 36px rgba(199,255,66,.025), 0 0 0 80px rgba(199,255,66,.018); animation: maex-orbit 18s linear infinite; pointer-events: none; }
+.maex-page .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: 82px; }
+.maex-page .hero-grid > *, .maex-page .hero-copy, .maex-page .terminal { min-width: 0; }
+.maex-page .hero-copy { position: relative; max-width: 700px; }
+.maex-page .hero h1 { position: relative; z-index: 1; margin: 25px 0 27px; font-size: clamp(72px, 8.2vw, 132px); line-height: .86; font-weight: 700; text-transform: uppercase; }
+.maex-page .hero h1 em { color: #c7ff42; font-style: normal; }
+.maex-page .hero-lead { max-width: 555px; margin: 0; color: #b6bdc9; font-size: 19px; line-height: 1.65; }
+.maex-page .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.maex-page .button-primary, .maex-page .button-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 49px; padding: 0 23px; border: 1px solid #c7ff42; border-radius: 999px; cursor: pointer; font: 600 11px var(--app-font-display); text-transform: uppercase; letter-spacing: .04em; transition: transform .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease; }
+.maex-page .button-primary { color: #070a12; background: #c7ff42; }
+.maex-page .button-ghost { color: #e4e6dc; background: transparent; border-color: #38404b; }
+.maex-page .button-ghost:hover { color: #c7ff42; border-color: #c7ff42; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(199,255,66,.08); }
+.maex-page .hero-note { display: flex; gap: 16px; align-items: center; margin-top: 47px; color: #6d7585; font: 11px var(--app-font-mono); }
+.maex-page .hero-note span { color: #c7ff42; }
+.maex-page .usdt-coin { position: absolute; z-index: 0; top: -78px; left: 31%; width: 350px; height: 350px; border-radius: 50%; opacity: .2; transform-style: preserve-3d; animation: maex-coinFloat 5s ease-in-out infinite; pointer-events: none; }
+.maex-page .usdt-coin::before, .maex-page .usdt-coin::after { content: ''; position: absolute; inset: -15px; border: 1px solid rgba(255, 190, 67, .23); border-radius: 50%; animation: maex-coinHalo 5s ease-in-out infinite; }
+.maex-page .usdt-coin::after { inset: -29px; opacity: .55; animation-delay: -1.4s; }
+.maex-page .coin-rim { position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(110deg, #704519 0%, #ffd36a 19%, #a96517 42%, #ffe398 61%, #7c4815 83%, #db9b34 100%); box-shadow: inset 0 0 0 8px rgba(75, 40, 8, .38), 0 0 45px rgba(255, 185, 52, .22); animation: maex-coinSpin 8s linear infinite; }
+.maex-page .coin-face { position: absolute; inset: 9px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid rgba(255, 230, 150, .78); border-radius: 50%; color: #4d2d0a; background: radial-gradient(circle at 30% 25%, #ffe9a7 0%, #d79429 48%, #8e5214 100%); box-shadow: inset 0 0 0 5px rgba(113, 61, 9, .24), inset 12px -10px 18px rgba(73, 38, 4, .26); animation: maex-coinSpin 8s linear infinite reverse; }
+.maex-page .coin-face span { font: 800 92px/.7 var(--app-font-sans); text-shadow: 1px 2px 0 rgba(255, 226, 137, .65); }
+.maex-page .coin-face small { font: 700 12px var(--app-font-mono); letter-spacing: .2em; }
+.maex-page .terminal { position: relative; min-height: 430px; padding: 17px; border: 1px solid #303946; background: rgba(12,17,28,.88); box-shadow: 25px 25px 0 rgba(199,255,66,.08); }
+.maex-page .terminal::before, .maex-page .terminal::after { content: ''; position: absolute; width: 13px; height: 13px; border-color: #c7ff42; border-style: solid; }
+.maex-page .terminal::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.maex-page .terminal::after { right: -1px; bottom: -1px; border-width: 0 2px 2px 0; }
+.maex-page .terminal-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid #29313d; color: #7c8493; font: 10px var(--app-font-mono); }
+.maex-page .terminal-status { display: flex; align-items: center; gap: 7px; color: #c7ff42; }
+.maex-page .terminal-status i { width: 6px; height: 6px; border-radius: 50%; background: #c7ff42; box-shadow: 0 0 12px #c7ff42; }
+.maex-page .terminal-body { padding: 25px 9px 12px; }
+.maex-page .terminal-kicker { color: #7c8493; font: 10px var(--app-font-mono); text-transform: uppercase; letter-spacing: .09em; }
+.maex-page .terminal-value { margin: 8px 0 23px; color: #f0f2e9; font: 600 clamp(42px, 5vw, 63px) var(--app-font-display); letter-spacing: -.02em; }
+.maex-page .terminal-value small { margin-left: 9px; color: #c7ff42; font: 500 12px var(--app-font-mono); vertical-align: middle; }
+.maex-page .sparkline { display: flex; align-items: end; height: 112px; gap: 7px; padding: 14px 0; border-top: 1px solid #29313d; border-bottom: 1px solid #29313d; }
+.maex-page .sparkline i { flex: 1; min-width: 4px; background: #c7ff42; opacity: .8; animation: maex-bars 2.8s ease-in-out infinite alternate; }
+.maex-page .sparkline i:nth-child(2n) { background: #7ce8e7; opacity: .65; animation-delay: -.5s; }
+.maex-page .sparkline i:nth-child(3n) { animation-delay: -.9s; }
+.maex-page .terminal-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 19px; }
+.maex-page .terminal-metric small { display: block; margin-bottom: 6px; color: #6e7788; font: 9px var(--app-font-mono); text-transform: uppercase; }
+.maex-page .terminal-metric strong { color: #e6e8de; font: 500 14px var(--app-font-mono); }
+.maex-page .terminal-metric strong.green { color: #c7ff42; }
+
+.maex-page .ticker { position: relative; z-index: 2; border-bottom: 1px solid rgba(177,194,215,.11); background: #0c111b; }
+.maex-page .ticker-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+.maex-page .ticker-item { min-height: 91px; display: flex; justify-content: space-between; flex-direction: column; padding: 19px 25px 17px 0; border-right: 1px solid #202a36; }
+.maex-page .ticker-item + .ticker-item { padding-left: 25px; }
+.maex-page .ticker-label { color: #707b8a; font: 10px var(--app-font-mono); letter-spacing: .04em; text-transform: uppercase; }
+.maex-page .ticker-value { color: #e9eadf; font: 500 20px var(--app-font-display); letter-spacing: .02em; }
+.maex-page .ticker-value b { margin-left: 7px; color: #c7ff42; font: 10px var(--app-font-mono); font-weight: 400; }
+
+.maex-page .section { position: relative; padding: 96px 0; }
+.maex-page .section.alt { background: #0a0f19; border-top: 1px solid rgba(177,194,215,.09); border-bottom: 1px solid rgba(177,194,215,.09); }
+.maex-page .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 35px; margin-bottom: 48px; }
+.maex-page .section-heading h2 { max-width: 720px; margin: 18px 0 0; font-size: clamp(52px, 6.3vw, 92px); line-height: .91; text-transform: uppercase; font-weight: 700; }
+.maex-page .section-heading p { max-width: 345px; margin: 0; color: #9fa8b7; font-size: 16px; line-height: 1.7; }
+.maex-page .feature-layout { display: grid; grid-template-columns: .95fr 1.05fr; gap: 79px; align-items: start; }
+.maex-page .feature-rail { position: sticky; top: 125px; padding-top: 9px; }
+.maex-page .feature-rail h3 { max-width: 390px; margin: 20px 0 19px; color: #eff0e6; font: 700 51px/1.01 var(--app-font-display); text-transform: uppercase; }
+.maex-page .feature-rail p { max-width: 390px; color: #9aa3b1; font-size: 16px; line-height: 1.75; }
+.maex-page .feature-index { display: flex; gap: 12px; align-items: center; color: #687384; font: 11px var(--app-font-mono); }
+.maex-page .feature-index span { color: #c7ff42; }
+.maex-page .feature-list { display: grid; gap: 14px; }
+.maex-page .feature-card { position: relative; display: grid; grid-template-columns: 52px 1fr 20px; gap: 22px; align-items: start; padding: 31px 30px 33px; border: 1px solid #25303c; background: #0e1520; transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
+.maex-page .feature-card:hover { border-color: #c7ff42; transform: translateX(6px) translateY(-3px); box-shadow: 0 14px 35px rgba(0,0,0,.2), 0 0 28px rgba(199,255,66,.08); }
+.maex-page .feature-card::before { content: ''; position: absolute; top: 0; left: 0; width: 43px; height: 2px; background: #c7ff42; }
+.maex-page .feature-number { color: #c7ff42; font: 500 14px var(--app-font-mono); }
+.maex-page .feature-card > div { min-width: 0; }
+.maex-page .feature-card:hover .feature-icon { color: #c7ff42; transform: rotate(-9deg) scale(1.12); }
+.maex-page .feature-icon { color: #697687; transition: color .25s ease, transform .25s ease; }
+.maex-page .feature-card h3 { margin: 0 0 10px; color: #eef0e8; font-size: 21px; font-weight: 600; }
+.maex-page .feature-card p { margin: 0; color: #9aa3b1; font-size: 15px; line-height: 1.7; }
+.maex-page .process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid #2a3541; }
+.maex-page .process-item { min-height: 250px; padding: 31px 28px 30px 0; border-right: 1px solid #2a3541; }
+.maex-page .process-item + .process-item { padding-left: 28px; }
+.maex-page .process-item:last-child { border-right: 0; }
+.maex-page .process-number { color: #c7ff42; font: 500 11px var(--app-font-mono); }
+.maex-page .process-item h3 { margin: 30px 0 14px; font: 600 29px var(--app-font-display); text-transform: uppercase; }
+.maex-page .process-item p { max-width: 290px; margin: 0; color: #9aa3b1; font-size: 15px; line-height: 1.7; }
+
+.maex-page .stat-band { padding: 83px 0; background: #c7ff42; color: #070a12; }
+.maex-page .stat-grid { display: grid; grid-template-columns: 1.1fr repeat(3, 1fr); gap: 31px; align-items: end; }
+.maex-page .stat-intro { max-width: 240px; font: 500 14px/1.45 var(--app-font-mono); text-transform: uppercase; }
+.maex-page .stat { padding-left: 23px; border-left: 1px solid rgba(7,10,18,.3); }
+.maex-page .stat-value { display: block; font: 600 clamp(45px, 5.8vw, 75px)/.9 var(--app-font-display); }
+.maex-page .stat-label { display: block; margin-top: 11px; font: 10px var(--app-font-mono); text-transform: uppercase; letter-spacing: .04em; }
+
+.maex-page .package-layout { display: grid; grid-template-columns: .7fr 1.3fr; align-items: start; gap: 75px; }
+.maex-page .package-copy h2 { max-width: 430px; margin: 17px 0; font: 700 67px/.91 var(--app-font-display); text-transform: uppercase; }
+.maex-page .package-copy h2 em { color: #c7ff42; font-style: normal; }
+.maex-page .package-copy p { max-width: 390px; color: #a2aab8; font-size: 16px; line-height: 1.75; }
+.maex-page .package-disclaimer { display: block; max-width: 360px; margin-top: 20px; color: #697586; font: 11px/1.6 var(--app-font-mono); }
+.maex-page .package-list { display: grid; gap: 0; border-top: 1px solid #2a3541; }
+.maex-page .package { display: grid; grid-template-columns: 1fr 230px; gap: 35px; padding: 28px 0; border-bottom: 1px solid #2a3541; transition: background .25s ease, padding .25s ease, transform .25s ease; }
+.maex-page .package:hover { padding-left: 18px; padding-right: 18px; background: rgba(199,255,66,.035); transform: translateX(4px); }
+.maex-page .package h3 { margin: 9px 0 9px; color: #eff0e6; font: 600 32px var(--app-font-display); text-transform: uppercase; }
+.maex-page .package p { max-width: 460px; margin: 0; color: #9ca5b4; font-size: 14px; line-height: 1.7; }
+.maex-page .package-kicker { display: flex; align-items: center; gap: 12px; color: #c7ff42; font: 10px var(--app-font-mono); text-transform: uppercase; }
+.maex-page .package-number { color: #647080; }
+.maex-page .package-side { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 18px; }
+.maex-page .package-side > div { display: grid; gap: 6px; }
+.maex-page .package-label { color: #697586; font: 9px var(--app-font-mono); text-transform: uppercase; }
+.maex-page .package-side strong { color: #f0f2e8; font: 600 17px var(--app-font-display); white-space: nowrap; }
+.maex-page .package-side .package-roi { color: #c7ff42; }
+.maex-page .package-arrow { grid-column: 1 / -1; justify-self: end; color: #707b8a; transition: color .2s ease, transform .2s ease; }
+.maex-page .package:hover .package-arrow { color: #c7ff42; transform: translateX(4px); }
+
+.maex-page .trust-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 90px; }
+.maex-page .trust-copy h2 { max-width: 420px; margin: 17px 0 22px; font: 700 64px/.93 var(--app-font-display); text-transform: uppercase; }
+.maex-page .trust-copy p { max-width: 400px; color: #a2aab8; font-size: 16px; line-height: 1.75; }
+.maex-page .trust-quote { margin-top: 33px; padding-left: 18px; border-left: 2px solid #c7ff42; color: #dfe3d8; font-size: 13px; line-height: 1.65; }
+.maex-page .faq-list { border-top: 1px solid #2a3541; }
+.maex-page .faq { border-bottom: 1px solid #2a3541; }
+.maex-page .faq-button { width: 100%; display: flex; justify-content: space-between; gap: 20px; padding: 22px 0; color: #e4e6dd; border: 0; background: transparent; text-align: left; cursor: pointer; font-size: 14px; }
+.maex-page .faq-button svg { flex: 0 0 auto; color: #c7ff42; transition: transform .25s ease; }
+.maex-page .faq.open .faq-button svg { transform: rotate(45deg); }
+.maex-page .faq-answer { max-width: 570px; height: 0; overflow: hidden; color: #9299a7; font-size: 13px; line-height: 1.65; transition: height .3s ease; }
+.maex-page .faq.open .faq-answer { height: 76px; }
+
+.maex-page .capture { position: relative; padding: 101px 0 112px; border-top: 1px solid #2a3541; background: #0d141f; overflow: hidden; }
+.maex-page .capture::after { content: 'MAEX'; position: absolute; right: -20px; bottom: -55px; color: rgba(199,255,66,.045); font: 700 260px/.8 var(--app-font-display); pointer-events: none; }
+.maex-page .capture-grid { position: relative; z-index: 1; display: grid; grid-template-columns: .86fr 1.14fr; gap: 80px; align-items: end; }
+.maex-page .capture h2 { max-width: 520px; margin: 18px 0 0; font: 700 78px/.88 var(--app-font-display); text-transform: uppercase; }
+.maex-page .capture p { max-width: 520px; margin: 0 0 17px; color: #a2aab8; font-size: 16px; line-height: 1.75; }
+.maex-page .capture-form { display: flex; max-width: 610px; border-bottom: 1px solid #627085; }
+.maex-page .capture-form input { flex: 1; min-width: 0; padding: 15px 0; color: #f2f0e9; border: 0; outline: 0; background: transparent; font: 13px var(--app-font-mono); }
+.maex-page .capture-form input::placeholder { color: #687384; }
+.maex-page .capture-form button { border: 0; cursor: pointer; background: transparent; color: #c7ff42; }
+.maex-page .capture-error { margin: 10px 0 0; color: #ff8a4d; font: 11px var(--app-font-mono); }
+.maex-page .capture-success { margin: 12px 0 0; color: #c7ff42; font: 12px var(--app-font-mono); }
+
+.maex-page .site-footer { padding: 43px 0 38px; border-top: 1px solid #1f2934; }
+.maex-page .footer-top { display: flex; justify-content: space-between; align-items: start; gap: 30px; }
+.maex-page .footer-brand p { max-width: 255px; margin: 17px 0 0; color: #717b8b; font-size: 12px; line-height: 1.6; }
+.maex-page .footer-links { display: flex; gap: 27px; color: #89919f; font: 10px var(--app-font-mono); text-transform: uppercase; }
+.maex-page .footer-links a:hover { color: #c7ff42; }
+.maex-page .footer-bottom { display: flex; justify-content: space-between; margin-top: 62px; padding-top: 16px; border-top: 1px solid #1f2934; color: #596473; font: 10px var(--app-font-mono); }
+.maex-page .footer-bottom span:last-child { color: #c7ff42; }
+.maex-page .mobile-cta { display: none; }
+
+.maex-page .reveal { opacity: 0; transform: translateY(22px); animation: maex-revealIn .8s cubic-bezier(.2,.8,.2,1) forwards; }
+.maex-page .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.maex-page .delay-1 { animation-delay: .1s; }
+.maex-page .delay-2 { animation-delay: .2s; }
+.maex-page .delay-3 { animation-delay: .3s; }
+
+@keyframes maex-orbit { to { transform: rotate(360deg); } }
+@keyframes maex-bars { from { transform: scaleY(.72); } to { transform: scaleY(1); } }
+@keyframes maex-revealIn { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes maex-coinSpin { 0% { transform: rotateY(0deg) rotateZ(-7deg); } 50% { transform: rotateY(180deg) rotateZ(7deg); } 100% { transform: rotateY(360deg) rotateZ(-7deg); } }
+@keyframes maex-coinFloat { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(3deg); } }
+@keyframes maex-coinHalo { 0%, 100% { transform: scale(.96); opacity: .42; } 50% { transform: scale(1.05); opacity: .8; } }
+
+@media (max-width: 850px) {
+  .maex-page .container { width: min(100% - 34px, 650px); }
+  .maex-page .desktop-nav, .maex-page .site-header .nav-action { display: none; }
+  .maex-page .menu-button { display: block; }
+  .maex-page .mobile-nav { display: grid; position: absolute; top: 76px; left: 0; right: 0; padding: 13px 17px 20px; border-bottom: 1px solid #2a3541; background: #0a0f19; }
+  .maex-page .mobile-nav a { padding: 15px 4px; border-bottom: 1px solid #202a36; color: #aeb4c0; font: 11px var(--app-font-sans); text-transform: uppercase; }
+  .maex-page .mobile-nav .mobile-nav-cta { margin-top: 15px; border: 1px solid #c7ff42; border-radius: 999px; color: #070a12; background: #c7ff42; text-align: center; font-family: var(--app-font-display); font-weight: 600; }
+  .maex-page .hero { min-height: auto; padding: 133px 0 72px; }
+  .maex-page .hero-grid, .maex-page .feature-layout, .maex-page .package-layout, .maex-page .trust-layout, .maex-page .capture-grid { grid-template-columns: minmax(0, 1fr); gap: 52px; }
+  .maex-page .hero h1 { font-size: clamp(52px, 16vw, 104px); letter-spacing: -.04em; }
+  .maex-page .hero-lead { max-width: 100%; font-size: 17px; }
+  .maex-page .hero-actions { max-width: 100%; }
+  .maex-page .hero::after { width: 260px; height: 260px; right: -160px; top: 90px; }
+  .maex-page .usdt-coin { top: -64px; left: calc(50% - 125px); width: 250px; height: 250px; opacity: .18; }
+  .maex-page .ticker-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .maex-page .ticker-item { min-width: 0; }
+  .maex-page .ticker-item:nth-child(n + 3) { border-top: 1px solid #202a36; }
+  .maex-page .terminal { min-height: 375px; box-shadow: 12px 12px 0 rgba(199,255,66,.08); }
+  .maex-page .section { padding: 76px 0; }
+  .maex-page .section-heading { display: block; margin-bottom: 38px; }
+  .maex-page .section-heading p { margin-top: 22px; font-size: 15px; }
+  .maex-page .feature-rail { position: static; }
+  .maex-page .feature-rail h3 { font-size: clamp(40px, 12vw, 45px); }
+  .maex-page .process-grid { grid-template-columns: 1fr; }
+  .maex-page .process-item, .maex-page .process-item + .process-item { min-height: auto; padding: 26px 0; border-right: 0; border-bottom: 1px solid #2a3541; }
+  .maex-page .process-item:last-child { border-bottom: 0; }
+  .maex-page .stat-band { padding: 62px 0; }
+  .maex-page .stat-grid { grid-template-columns: 1fr 1fr; gap: 25px; }
+  .maex-page .stat-intro { grid-column: 1 / -1; max-width: 350px; margin-bottom: 7px; }
+  .maex-page .stat { padding-left: 13px; }
+  .maex-page .package-copy h2, .maex-page .trust-copy h2 { font-size: clamp(44px, 14vw, 60px); }
+  .maex-page .capture h2 { font-size: clamp(48px, 16vw, 66px); }
+  .maex-page .capture-grid { gap: 31px; }
+  .maex-page .package { grid-template-columns: minmax(0, 1fr); gap: 23px; }
+  .maex-page .package-main, .maex-page .package-side { min-width: 0; }
+  .maex-page .package:hover { padding-left: 10px; padding-right: 10px; }
+  .maex-page .package-side { max-width: 300px; }
+  .maex-page .footer-top { display: block; }
+  .maex-page .footer-links { margin-top: 28px; flex-wrap: wrap; }
+  .maex-page .footer-bottom { display: block; line-height: 2; }
+  .maex-page .mobile-cta { display: flex; position: fixed; z-index: 25; right: 18px; bottom: 16px; left: 18px; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 999px; color: #070a12; background: #c7ff42; box-shadow: 0 9px 25px rgba(0,0,0,.34); font: 600 11px var(--app-font-display); text-transform: uppercase; }
+}
+@media (max-width: 430px) {
+  .maex-page .container { width: calc(100% - 30px); }
+  .maex-page .hero-note { align-items: start; flex-direction: column; gap: 7px; }
+  .maex-page .terminal-bottom { gap: 6px; }
+  .maex-page .terminal-metric strong { font-size: 12px; }
+  .maex-page .feature-card { grid-template-columns: 34px 1fr 17px; gap: 10px; padding: 25px 16px; }
+  .maex-page .ticker-item { padding-right: 11px; }
+  .maex-page .ticker-item + .ticker-item { padding-left: 11px; }
+  .maex-page .ticker-value { font-size: 17px; }
+}
