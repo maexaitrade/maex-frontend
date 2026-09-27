@@ -10,17 +10,21 @@ export default function Withdraw() {
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState(undefined); // undefined = loading
   const [items, setItems] = useState(null);
+  const [cfg, setCfg] = useState(null);
   const [busy, setBusy] = useState(false);
 
   async function load() {
-    const [dash, list] = await Promise.all([api.get('/me/dashboard'), api.get('/withdrawals')]);
+    const [dash, list, settings] = await Promise.all([api.get('/me/dashboard'), api.get('/withdrawals'), api.get('/settings')]);
     setWallet(dash.wallet);
     setWalletAddress(dash.wallet_address || null);
     setItems(list.items);
+    setCfg(settings);
   }
   useEffect(() => { load().catch((e) => toast.err(e.message)); }, []);
 
-  const CHARGE = 0.06, MIN = 50;
+  const CHARGE_PCT = cfg?.withdraw_charge ?? 6;
+  const CHARGE = CHARGE_PCT / 100;
+  const MIN = cfg?.min_withdraw ?? 50;
   const amt = Number(amount) || 0;
   const charge = +(amt * CHARGE).toFixed(2);
   const net = +(amt - charge).toFixed(2);
@@ -67,7 +71,7 @@ export default function Withdraw() {
             <input className="input mono" type="number" min={MIN} step="0.01" required value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={`min ${MIN}`} />
           </div>
           <div className="card tight" style={{ background: 'rgba(6,10,22,.5)', marginBottom: 16 }}>
-            <div className="between" style={{ fontSize: '.88rem', marginBottom: 6 }}><span className="muted">Withdrawal charge (6%)</span><span className="mono">{money(charge)}</span></div>
+            <div className="between" style={{ fontSize: '.88rem', marginBottom: 6 }}><span className="muted">Withdrawal charge ({CHARGE_PCT}%)</span><span className="mono">{money(charge)}</span></div>
             <div className="between" style={{ fontSize: '.95rem', fontWeight: 600 }}><span>You receive</span><span className="mono gradient-text">{money(net > 0 ? net : 0)}</span></div>
           </div>
           <button className="btn primary block" disabled={busy || amt < MIN}>
