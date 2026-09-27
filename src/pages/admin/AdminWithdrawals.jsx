@@ -3,6 +3,26 @@ import { api } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 import { Loader, Empty, Badge, money } from '../../components/ui';
 
+function CopyBtn({ text, toast, label = 'address' }) {
+  const [done, setDone] = useState(false);
+  async function copy(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setDone(true);
+      toast.ok(`Copied ${label}`);
+      setTimeout(() => setDone(false), 1500);
+    } catch { toast.err('Copy failed'); }
+  }
+  return (
+    <button type="button" className="btn ghost sm" onClick={copy} title={`Copy ${label}`}
+      style={{ padding: '2px 8px', fontSize: '.72rem', flex: 'none' }}>
+      {done ? '✓ Copied' : 'Copy'}
+    </button>
+  );
+}
+
 function PayModal({ item, onClose, onDone }) {
   const toast = useToast();
   const [txHash, setTxHash] = useState('');
@@ -23,24 +43,46 @@ function PayModal({ item, onClose, onDone }) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="card-title" style={{ marginBottom: 12 }}>Pay Withdrawal #{item.id}</div>
+
         <div className="grid" style={{ gap: 8, marginBottom: 14 }}>
           <div className="between">
             <span className="muted">Member</span>
-            <span style={{ fontWeight: 500 }}>{item.name}</span>
+            <span style={{ fontWeight: 600 }}>{item.name} {item.member_code && <span className="mono muted" style={{ fontSize: '.78rem' }}>({item.member_code})</span>}</span>
           </div>
           <div className="between">
+            <span className="muted">Email</span>
+            <span style={{ fontSize: '.85rem' }}>{item.email}</span>
+          </div>
+          {item.phone && (
+            <div className="between">
+              <span className="muted">Phone</span>
+              <span className="mono" style={{ fontSize: '.85rem' }}>{item.phone}</span>
+            </div>
+          )}
+          <div className="between" style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 8 }}>
             <span className="muted">Amount (gross)</span>
             <span className="mono">{money(item.amount)}</span>
           </div>
           <div className="between">
-            <span className="muted">Net to send</span>
-            <span className="mono gradient-text" style={{ fontWeight: 700 }}>{money(item.net_amount)}</span>
+            <span className="muted">Charge (6%)</span>
+            <span className="mono" style={{ color: '#fb7185' }}>−{money(item.charge)}</span>
           </div>
-          <div className="between" style={{ flexWrap: 'wrap', gap: 4 }}>
-            <span className="muted">TRC-20 address</span>
-            <span className="mono" style={{ fontSize: '.8rem', wordBreak: 'break-all', textAlign: 'right', maxWidth: 260 }}>{item.wallet_address}</span>
+          <div className="between" style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 8 }}>
+            <span className="muted" style={{ fontWeight: 600 }}>Net to send</span>
+            <span className="mono gradient-text" style={{ fontWeight: 800, fontSize: '1.05rem' }}>{money(item.net_amount)}</span>
           </div>
         </div>
+
+        <div className="field" style={{ marginBottom: 14 }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>TRC-20 wallet address</span>
+            <CopyBtn text={item.wallet_address} toast={toast} label="address" />
+          </label>
+          <div className="input mono" style={{ fontSize: '.82rem', wordBreak: 'break-all', userSelect: 'all', background: 'rgba(255,255,255,.04)', cursor: 'text' }}>
+            {item.wallet_address}
+          </div>
+        </div>
+
         <form onSubmit={submit} className="grid" style={{ gap: 10 }}>
           <div className="field">
             <label>Transaction hash <span className="muted">(optional)</span></label>
@@ -122,7 +164,12 @@ export default function AdminWithdrawals() {
                     </td>
                     <td className="mono">{money(w.amount)}</td>
                     <td className="mono gradient-text" style={{ fontWeight: 600 }}>{money(w.net_amount)}</td>
-                    <td className="mono muted hide-sm" style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }}>{w.wallet_address}</td>
+                    <td className="hide-sm">
+                      <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+                        <span className="mono muted" style={{ maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={w.wallet_address}>{w.wallet_address}</span>
+                        <CopyBtn text={w.wallet_address} toast={toast} label="address" />
+                      </div>
+                    </td>
                     <td><Badge status={w.status} /></td>
                     <td className="muted">{new Date(w.requested_at || w.created_at).toLocaleDateString()}</td>
                     <td>
