@@ -74,10 +74,18 @@ export default function Deposit() {
   const [amount, setAmount] = useState('');
   const [payment, setPayment] = useState(null);
   const [items, setItems] = useState(null);
+  const [cfg, setCfg] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  async function load() { setItems((await api.get('/deposits')).items); }
+  async function load() {
+    const [deps, settings] = await Promise.all([api.get('/deposits'), api.get('/settings')]);
+    setItems(deps.items);
+    setCfg(settings);
+  }
   useEffect(() => { load().catch((e) => toast.err(e.message)); }, []);
+
+  const MIN = cfg?.min_deposit ?? 100;
+  const amt = Number(amount) || 0;
 
   async function submit(e) {
     e.preventDefault();
@@ -127,17 +135,20 @@ export default function Deposit() {
                 <input
                   className="input mono"
                   type="number"
-                  min="1"
+                  min={MIN}
                   step="0.01"
                   required
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  placeholder="100.00"
+                  placeholder={`min ${MIN}`}
                 />
               </div>
-              <button className="btn primary block" disabled={busy}>
+              <button className="btn primary block" disabled={busy || amt < MIN}>
                 {busy ? <span className="spinner" /> : 'Generate Payment Address'}
               </button>
+              <p className="muted" style={{ fontSize: '.8rem', marginTop: 10 }}>
+                Minimum deposit is {money(MIN)}. Funds are auto-credited once the payment confirms.
+              </p>
             </form>
           </>
         )}
