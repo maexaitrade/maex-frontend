@@ -17,21 +17,24 @@ export function AuthProvider({ children }) {
 
   useEffect(() => { if (!getToken()) setUser(null); }, []);
 
+  function setSession(token, u) {
+    setToken(token); saveUser(u); setUser(u);
+    return u;
+  }
   async function login(email, password) {
     const res = await api.post('/auth/login', { email, password }, { auth: false });
-    setToken(res.token); saveUser(res.user); setUser(res.user);
-    return res.user;
+    return setSession(res.token, res.user);
   }
+  // Registration no longer logs in — the account must verify its email first.
+  // Returns the API response ({ verifyRequired, email, message }).
   async function register(payload, sponsorId) {
     const q = sponsorId ? `?ref=${encodeURIComponent(sponsorId)}` : '';
-    const res = await api.post(`/auth/register${q}`, payload, { auth: false });
-    setToken(res.token); saveUser(res.user); setUser(res.user);
-    return res.user;
+    return api.post(`/auth/register${q}`, payload, { auth: false });
   }
   function logout() { setToken(null); saveUser(null); setUser(null); }
 
   return (
-    <AuthCtx.Provider value={{ user, ready, login, register, logout, isAdmin: user?.role === 'admin' }}>
+    <AuthCtx.Provider value={{ user, ready, login, register, logout, setSession, isAdmin: user?.role === 'admin' }}>
       {children}
     </AuthCtx.Provider>
   );
