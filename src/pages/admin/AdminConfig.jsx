@@ -255,6 +255,7 @@ function SettingsTab() {
     booster_directs: 'Direct refs required for booster',
     booster_percent: 'Booster % of sponsor package',
     cap_multiplier: 'Earning cap = amount × multiplier',
+    min_deposit: 'Minimum deposit amount ($)',
     min_withdraw: 'Minimum withdrawal amount ($)',
     withdraw_charge: 'Withdrawal fee %',
     deposit_network: 'Accepted deposit network',
