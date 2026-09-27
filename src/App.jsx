@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminSetup from './pages/AdminSetup';
 import Dashboard from './pages/Dashboard';
 import Packages from './pages/Packages';
 import Wallet from './pages/Wallet';
@@ -32,6 +33,7 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/admin-setup" element={<AdminSetup />} />
 
       <Route path="/app" element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Navigate to="dashboard" replace />} />
