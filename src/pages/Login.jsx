@@ -38,7 +38,10 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
           </div>
           <div className="field">
-            <label>Password</label>
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span>Password</span>
+              <Link to="/forgot-password" className="gradient-text" style={{ fontWeight: 600, fontSize: '.8rem' }}>Forgot?</Link>
+            </label>
             <input className="input" type="password" required value={password}
               onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
           </div>
