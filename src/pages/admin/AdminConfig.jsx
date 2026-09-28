@@ -259,6 +259,8 @@ function SettingsTab() {
     min_withdraw: 'Minimum withdrawal amount ($)',
     withdraw_charge: 'Withdrawal fee %',
     deposit_network: 'Accepted deposit network',
+    admin_deposit_address: 'TRC-20 USDT address shown to users for deposits',
+    deposit_via: 'Deposit mode: admin (direct) or gateway (NOWPayments)',
   };
 
   return (
