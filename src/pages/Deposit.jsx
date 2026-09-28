@@ -69,6 +69,88 @@ function isNowPaymentsExpired(d) {
   return d.status === 'expired';
 }
 
+function DirectDepositForm({ cfg, onDeposited }) {
+  const toast = useToast();
+  const [amount, setAmount] = useState('');
+  const [txHash, setTxHash] = useState('');
+  const [busy, setBusy] = useState(false);
+  const MIN = cfg?.min_deposit ?? 100;
+  const amt = Number(amount) || 0;
+  const address = cfg?.admin_deposit_address || '';
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await api.post('/deposits', { amount: Number(amount), tx_hash: txHash.trim() });
+      toast.ok('Deposit request submitted — admin will verify and approve it');
+      setAmount('');
+      setTxHash('');
+      onDeposited();
+    } catch (err) { toast.err(err.message); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <>
+      <div className="card tight" style={{ background: 'var(--brand-soft)', border: '1px solid var(--border)', marginBottom: 18 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <span className="badge cyan">TRC-20</span>
+          <span className="muted" style={{ fontSize: '.85rem' }}>Send USDT to the address below, then submit your transaction hash.</span>
+        </div>
+      </div>
+
+      {address ? (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 16px' }}>
+            <div style={{ background: '#fff', padding: 12, borderRadius: 10 }}>
+              <QRCodeSVG value={address} size={160} />
+            </div>
+          </div>
+          <CopyField label="Deposit address (USDT TRC-20)" value={address} />
+        </div>
+      ) : (
+        <div className="card tight" style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.3)', marginBottom: 18 }}>
+          <span className="muted" style={{ fontSize: '.85rem' }}>Deposit address not configured yet — contact admin.</span>
+        </div>
+      )}
+
+      <form onSubmit={submit}>
+        <div className="field">
+          <label>Amount (USDT)</label>
+          <input
+            className="input mono"
+            type="number"
+            min={MIN}
+            step="0.01"
+            required
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder={`min ${MIN}`}
+          />
+        </div>
+        <div className="field">
+          <label>Transaction Hash</label>
+          <input
+            className="input mono"
+            required
+            value={txHash}
+            onChange={(e) => setTxHash(e.target.value)}
+            placeholder="Paste your TRC-20 transaction hash"
+            style={{ fontSize: '.85rem' }}
+          />
+        </div>
+        <button className="btn primary block" disabled={busy || amt < MIN || !txHash.trim() || !address}>
+          {busy ? <span className="spinner" /> : 'Submit Deposit Request'}
+        </button>
+        <p className="muted" style={{ fontSize: '.8rem', marginTop: 10 }}>
+          Minimum deposit is {money(MIN)}. Admin will verify your transaction and credit your account.
+        </p>
+      </form>
+    </>
+  );
+}
+
 export default function Deposit() {
   const toast = useToast();
   const [amount, setAmount] = useState('');
@@ -84,10 +166,11 @@ export default function Deposit() {
   }
   useEffect(() => { load().catch((e) => toast.err(e.message)); }, []);
 
+  const isAdmin = cfg?.deposit_via === 'admin';
   const MIN = cfg?.min_deposit ?? 100;
   const amt = Number(amount) || 0;
 
-  async function submit(e) {
+  async function submitGateway(e) {
     e.preventDefault();
     setBusy(true);
     try {
@@ -114,12 +197,14 @@ export default function Deposit() {
       <div className="card" style={{ alignSelf: 'start' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div className="card-title" style={{ margin: 0 }}>Deposit USDT</div>
-          {payment && (
+          {!isAdmin && payment && (
             <button className="btn ghost sm" onClick={reset}>+ New deposit</button>
           )}
         </div>
 
-        {payment ? (
+        {isAdmin ? (
+          <DirectDepositForm cfg={cfg} onDeposited={load} />
+        ) : payment ? (
           <PaymentPending payment={payment} onDone={reset} />
         ) : (
           <>
@@ -129,7 +214,7 @@ export default function Deposit() {
                 <span className="muted" style={{ fontSize: '.85rem' }}>Powered by NOWPayments — auto-credited on confirmation.</span>
               </div>
             </div>
-            <form onSubmit={submit}>
+            <form onSubmit={submitGateway}>
               <div className="field">
                 <label>Amount (USDT)</label>
                 <input
