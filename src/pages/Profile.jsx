@@ -16,11 +16,15 @@ export default function Profile() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [networkLabel, setNetworkLabel] = useState('TRC20');
+  const [walletValid, setWalletValid] = useState(false);
 
   useEffect(() => {
     api.get('/me/dashboard').then((d) => {
       const addr = d.wallet_address || null;
       setCurrentAddr(addr);
+      setNetworkLabel(d.active_crypto_network_label || d.active_crypto_network || 'TRC20');
+      setWalletValid(Boolean(d.wallet_address_valid));
       if (addr) setInputVal(addr);
       setLoading(false);
     }).catch((e) => { toast.err(e.message); setLoading(false); });
@@ -44,6 +48,7 @@ export default function Profile() {
     try {
       const res = await api.patch('/me/profile', { wallet_address: inputVal.trim() });
       setCurrentAddr(res.wallet_address);
+      setWalletValid(true);
       setEditing(false);
       toast.ok('Wallet address saved');
     } catch (err) { toast.err(err.message); }
@@ -55,6 +60,7 @@ export default function Profile() {
     try {
       await api.delete('/me/profile/wallet');
       setCurrentAddr(null);
+      setWalletValid(false);
       setInputVal('');
       setEditing(false);
       setConfirmDelete(false);
@@ -81,18 +87,19 @@ export default function Profile() {
       </div>
 
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 6 }}>Payout Wallet (TRC-20)</div>
+        <div className="card-title" style={{ marginBottom: 6 }}>Payout Wallet ({networkLabel})</div>
         <p className="muted" style={{ fontSize: '.85rem', marginTop: 0, marginBottom: 18 }}>
-          Withdrawals are sent to this Tron TRC-20 USDT address. Only one address can be saved at a time.
+          Withdrawals currently use the admin-selected {networkLabel} network. Only one address can be saved at a time.
         </p>
 
         {loading ? (
           <div className="muted" style={{ fontSize: '.85rem' }}>Loading...</div>
         ) : currentAddr && !editing ? (
           <div>
-            <div className="card tight" style={{ background: 'rgba(52,211,153,.07)', border: '1px solid rgba(52,211,153,.25)', marginBottom: 14 }}>
+            <div className="card tight" style={{ background: walletValid ? 'rgba(52,211,153,.07)' : 'rgba(239,68,68,.08)', border: `1px solid ${walletValid ? 'rgba(52,211,153,.25)' : 'rgba(239,68,68,.3)'}`, marginBottom: 14 }}>
               <div className="muted" style={{ fontSize: '.75rem', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.06em' }}>Saved address</div>
-              <div className="mono" style={{ color: 'var(--green)', wordBreak: 'break-all', fontSize: '.88rem' }}>{currentAddr}</div>
+              <div className="mono" style={{ color: walletValid ? 'var(--green)' : 'var(--danger)', wordBreak: 'break-all', fontSize: '.88rem' }}>{currentAddr}</div>
+              {!walletValid && <div style={{ color: 'var(--danger)', fontSize: '.78rem', marginTop: 8 }}>This address is not valid for the active {networkLabel} network. Replace it before withdrawing.</div>}
             </div>
             <div className="row" style={{ gap: 10 }}>
               <button className="btn sm" style={{ flex: 1 }} onClick={() => { setEditing(true); setInputVal(currentAddr); }} disabled={busy}>
@@ -119,14 +126,14 @@ export default function Profile() {
         ) : (
           <form onSubmit={save}>
             <div className="field">
-              <label>TRC-20 Wallet Address</label>
+              <label>{networkLabel} Wallet Address</label>
               <input
                 ref={inputRef}
                 className="input mono"
                 required
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="T..."
+                placeholder={networkLabel === 'TRC20' ? 'T...' : networkLabel === 'BEP20' ? '0x...' : 'Solana wallet address'}
                 autoComplete="off"
               />
             </div>
