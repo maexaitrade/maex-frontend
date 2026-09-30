@@ -9,6 +9,8 @@ export default function Withdraw() {
   const [amount, setAmount] = useState('');
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState(undefined); // undefined = loading
+  const [walletAddressValid, setWalletAddressValid] = useState(false);
+  const [networkLabel, setNetworkLabel] = useState('TRC20');
   const [items, setItems] = useState(null);
   const [cfg, setCfg] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -17,6 +19,8 @@ export default function Withdraw() {
     const [dash, list, settings] = await Promise.all([api.get('/me/dashboard'), api.get('/withdrawals'), api.get('/settings')]);
     setWallet(dash.wallet);
     setWalletAddress(dash.wallet_address || null);
+    setWalletAddressValid(Boolean(dash.wallet_address_valid));
+    setNetworkLabel(dash.active_crypto_network_label || dash.active_crypto_network || 'TRC20');
     setItems(list.items);
     setCfg(settings);
   }
@@ -43,17 +47,19 @@ export default function Withdraw() {
 
   return (
     <div className="cols-2 even">
-      {/* Blocking modal when no withdrawal address is set */}
-      {walletAddress === null && (
+      {/* Blocking modal when the saved address cannot be used on the active network */}
+      {walletAddress !== undefined && (!walletAddress || !walletAddressValid) && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="card" style={{ maxWidth: 360, width: '100%', textAlign: 'center', padding: '32px 24px' }}>
             <div style={{ fontSize: '2.2rem', marginBottom: 14 }}>⚠</div>
-            <div className="card-title" style={{ marginBottom: 8 }}>No Withdrawal Address</div>
+            <div className="card-title" style={{ marginBottom: 8 }}>{walletAddress ? 'Update Withdrawal Address' : 'No Withdrawal Address'}</div>
             <p className="muted" style={{ fontSize: '.88rem', marginBottom: 24, lineHeight: 1.6 }}>
-              You need to save a TRC-20 USDT wallet address on your profile before requesting a withdrawal.
+              {walletAddress
+                ? `Your saved address is not valid for the active ${networkLabel} network. Replace it before requesting a withdrawal.`
+                : `Save a valid ${networkLabel} USDT wallet address on your profile before requesting a withdrawal.`}
             </p>
             <Link className="btn primary block" to="/app/profile?focus=wallet">
-              Add Withdrawal Address
+              {walletAddress ? `Change to ${networkLabel} Address` : 'Add Withdrawal Address'}
             </Link>
           </div>
         </div>
@@ -74,11 +80,11 @@ export default function Withdraw() {
             <div className="between" style={{ fontSize: '.88rem', marginBottom: 6 }}><span className="muted">Withdrawal charge ({CHARGE_PCT}%)</span><span className="mono">{money(charge)}</span></div>
             <div className="between" style={{ fontSize: '.95rem', fontWeight: 600 }}><span>You receive</span><span className="mono gradient-text">{money(net > 0 ? net : 0)}</span></div>
           </div>
-          <button className="btn primary block" disabled={busy || amt < MIN}>
+          <button className="btn primary block" disabled={busy || amt < MIN || !walletAddressValid}>
             {busy ? <span className="spinner" /> : 'Request Withdrawal'}
           </button>
           <p className="muted" style={{ fontSize: '.8rem', marginTop: 10 }}>
-            Set your TRC-20 wallet address in <Link className="gradient-text" to="/app/profile">Profile</Link> first. Minimum {money(MIN)}. Payout is instant after admin approval.
+            Set your {networkLabel} wallet address in <Link className="gradient-text" to="/app/profile">Profile</Link> first. Minimum {money(MIN)}. Payout is instant after admin approval.
           </p>
         </form>
       </div>
@@ -88,11 +94,12 @@ export default function Withdraw() {
         {!items ? <Loader /> : items.length === 0 ? <Empty>No withdrawals yet.</Empty> : (
           <div className="table-wrap">
             <table className="data">
-              <thead><tr><th>#</th><th>Amount</th><th>Charge</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
+              <thead><tr><th>#</th><th>Network</th><th>Amount</th><th>Charge</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
               <tbody>
                 {items.map((w) => (
                   <tr key={w.id}>
                     <td className="mono">{w.id}</td>
+                    <td><span className="badge cyan">{w.withdrawal_network || 'TRC20'}</span></td>
                     <td className="mono">{money(w.amount)}</td>
                     <td className="mono muted">{money(w.charge)}</td>
                     <td className="mono">{money(w.net_amount)}</td>
