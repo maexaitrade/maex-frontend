@@ -77,6 +77,8 @@ function DirectDepositForm({ cfg, onDeposited }) {
   const MIN = cfg?.min_deposit ?? 100;
   const amt = Number(amount) || 0;
   const address = cfg?.admin_deposit_address || '';
+  const network = cfg?.active_crypto_network || cfg?.deposit_network || 'TRC20';
+  const networkLabel = cfg?.active_crypto_network_label || cfg?.deposit_network_label || network;
 
   async function submit(e) {
     e.preventDefault();
@@ -95,7 +97,7 @@ function DirectDepositForm({ cfg, onDeposited }) {
     <>
       <div className="card tight" style={{ background: 'var(--brand-soft)', border: '1px solid var(--border)', marginBottom: 18 }}>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <span className="badge cyan">TRC-20</span>
+          <span className="badge cyan">{networkLabel}</span>
           <span className="muted" style={{ fontSize: '.85rem' }}>Send USDT to the address below, then submit your transaction hash.</span>
         </div>
       </div>
@@ -107,7 +109,10 @@ function DirectDepositForm({ cfg, onDeposited }) {
               <QRCodeSVG value={address} size={160} />
             </div>
           </div>
-          <CopyField label="Deposit address (USDT TRC-20)" value={address} />
+          <CopyField label={`Deposit address (USDT ${networkLabel})`} value={address} />
+          <div className="card tight" style={{ background: 'rgba(245,158,11,.07)', border: '1px solid rgba(245,158,11,.25)', fontSize: '.8rem' }}>
+            ⚠️ Send only USDT on the <strong>{networkLabel}</strong> network. Using another network can permanently lose funds.
+          </div>
         </div>
       ) : (
         <div className="card tight" style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.3)', marginBottom: 18 }}>
@@ -136,7 +141,7 @@ function DirectDepositForm({ cfg, onDeposited }) {
             required
             value={txHash}
             onChange={(e) => setTxHash(e.target.value)}
-            placeholder="Paste your TRC-20 transaction hash"
+            placeholder={`Paste your ${networkLabel} transaction hash`}
             style={{ fontSize: '.85rem' }}
           />
         </div>
@@ -244,11 +249,12 @@ export default function Deposit() {
         {!items ? <Loader /> : items.length === 0 ? <Empty>No deposits yet.</Empty> : (
           <div className="table-wrap">
             <table className="data">
-              <thead><tr><th>#</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th>Network</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
               <tbody>
                 {items.map((d) => (
                   <tr key={d.id}>
                     <td className="mono muted">{d.id}</td>
+                    <td><span className="badge cyan">{d.deposit_network || 'TRC20'}</span></td>
                     <td className="mono">{money(d.amount)}</td>
                     <td>
                       {isNowPaymentsPending(d)
