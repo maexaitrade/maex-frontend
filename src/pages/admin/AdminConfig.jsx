@@ -208,6 +208,105 @@ function RanksTab() {
 }
 
 // ---- Settings tab -------------------------------------------------------
+function DepositNetworksCard() {
+  const toast = useToast();
+  const [items, setItems] = useState(null);
+  const [drafts, setDrafts] = useState({});
+  const [busy, setBusy] = useState('');
+
+  async function load() {
+    const data = await api.get('/admin/deposit-networks');
+    setItems(data.items);
+    setDrafts(Object.fromEntries(data.items.map((item) => [item.code, item.address || ''])));
+  }
+
+  useEffect(() => { load().catch((e) => toast.err(e.message)); }, []);
+
+  function looksValid(code, value) {
+    const address = value.trim();
+    if (code === 'TRC20') return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address);
+    if (code === 'BEP20') return /^0x[0-9a-fA-F]{40}$/.test(address);
+    if (code === 'SPL') return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+    return false;
+  }
+
+  async function saveAddress(item) {
+    const address = (drafts[item.code] || '').trim();
+    if (!looksValid(item.code, address)) {
+      toast.err(`Enter a valid ${item.label} address`);
+      return;
+    }
+    setBusy(`save-${item.code}`);
+    try {
+      await api.patch(`/admin/deposit-networks/${item.code}`, { address });
+      toast.ok(`${item.label} address saved`);
+      await load();
+    } catch (err) { toast.err(err.message); }
+    finally { setBusy(''); }
+  }
+
+  async function activate(item) {
+    setBusy(`active-${item.code}`);
+    try {
+      await api.patch('/admin/deposit-networks/active', { network: item.code });
+      toast.ok(`${item.label} is now active`);
+      await load();
+    } catch (err) { toast.err(err.message); }
+    finally { setBusy(''); }
+  }
+
+  return (
+    <div className="card">
+      <div className="between" style={{ marginBottom: 6 }}>
+        <div className="card-title">Deposit & Withdrawal Network</div>
+        <span className="muted" style={{ fontSize: '.78rem' }}>Only one network can be active</span>
+      </div>
+      <p className="muted" style={{ fontSize: '.82rem', marginTop: 0, marginBottom: 16 }}>
+        These are platform deposit addresses. The active network also controls validation of member withdrawal addresses.
+      </p>
+      {!items ? <Loader /> : (
+        <div className="grid" style={{ gap: 12 }}>
+          {items.map((item) => {
+            const address = drafts[item.code] || '';
+            const changed = address.trim() !== (item.address || '');
+            return (
+              <div key={item.code} className="card tight" style={{ border: item.active ? '1px solid rgba(163,230,53,.45)' : '1px solid var(--border)', background: item.active ? 'rgba(163,230,53,.05)' : undefined }}>
+                <div className="between" style={{ marginBottom: 10 }}>
+                  <div className="row" style={{ gap: 8 }}>
+                    <strong>{item.label}</strong>
+                    <span className={`badge ${item.active ? 'green' : 'amber'}`}>{item.active ? 'Active' : 'Inactive'}</span>
+                  </div>
+                  {!item.active && (
+                    <button className="btn ok sm" disabled={Boolean(busy) || !item.address} onClick={() => activate(item)}>
+                      {busy === `active-${item.code}` ? <span className="spinner" /> : 'Make Active'}
+                    </button>
+                  )}
+                </div>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label>{item.label} platform deposit address</label>
+                  <div className="row" style={{ gap: 8, alignItems: 'stretch' }}>
+                    <input
+                      className="input mono"
+                      value={address}
+                      onChange={(e) => setDrafts({ ...drafts, [item.code]: e.target.value })}
+                      placeholder={item.address_placeholder}
+                      autoComplete="off"
+                      style={{ flex: 1, fontSize: '.82rem' }}
+                    />
+                    <button className="btn primary sm" disabled={Boolean(busy) || !changed || !address.trim()} onClick={() => saveAddress(item)}>
+                      {busy === `save-${item.code}` ? <span className="spinner" /> : 'Save Address'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SettingsTab() {
   const toast = useToast();
   const [items, setItems] = useState(null);
@@ -265,6 +364,7 @@ function SettingsTab() {
 
   return (
     <div className="grid" style={{ gap: 16 }}>
+      <DepositNetworksCard />
       <div className="card">
         <div className="card-title" style={{ marginBottom: 14 }}>Platform Settings</div>
         {!items ? <Loader /> : (
