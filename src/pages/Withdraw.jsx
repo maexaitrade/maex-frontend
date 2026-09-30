@@ -10,6 +10,7 @@ export default function Withdraw() {
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState(undefined); // undefined = loading
   const [walletAddressValid, setWalletAddressValid] = useState(false);
+  const [addressNoticeDismissed, setAddressNoticeDismissed] = useState(false);
   const [networkLabel, setNetworkLabel] = useState('TRC20');
   const [items, setItems] = useState(null);
   const [cfg, setCfg] = useState(null);
@@ -47,10 +48,19 @@ export default function Withdraw() {
 
   return (
     <div className="cols-2 even">
-      {/* Blocking modal when the saved address cannot be used on the active network */}
-      {walletAddress !== undefined && (!walletAddress || !walletAddressValid) && (
+      {/* Dismissible notice when the saved address cannot be used on the active network */}
+      {!addressNoticeDismissed && walletAddress !== undefined && (!walletAddress || !walletAddressValid) && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="card" style={{ maxWidth: 360, width: '100%', textAlign: 'center', padding: '32px 24px' }}>
+          <div className="card" style={{ position: 'relative', maxWidth: 360, width: '100%', textAlign: 'center', padding: '32px 24px' }}>
+            <button
+              type="button"
+              className="btn ghost"
+              aria-label="Close withdrawal address notice"
+              onClick={() => setAddressNoticeDismissed(true)}
+              style={{ position: 'absolute', top: 8, right: 8, width: 44, height: 44, padding: 0, fontSize: '1.5rem', lineHeight: 1 }}
+            >
+              <span aria-hidden="true">×</span>
+            </button>
             <div style={{ fontSize: '2.2rem', marginBottom: 14 }}>⚠</div>
             <div className="card-title" style={{ marginBottom: 8 }}>{walletAddress ? 'Update Withdrawal Address' : 'No Withdrawal Address'}</div>
             <p className="muted" style={{ fontSize: '.88rem', marginBottom: 24, lineHeight: 1.6 }}>
