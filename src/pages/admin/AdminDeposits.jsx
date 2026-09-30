@@ -3,6 +3,12 @@ import { api } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 import { Loader, Empty, Badge, money } from '../../components/ui';
 
+const TX_EXPLORERS = {
+  TRC20: 'https://tronscan.org/#/transaction/',
+  BEP20: 'https://bscscan.com/tx/',
+  SPL: 'https://solscan.io/tx/',
+};
+
 function CopyBtn({ text }) {
   const [ok, setOk] = useState(false);
   const t = useRef(null);
@@ -167,7 +173,7 @@ export default function AdminDeposits() {
         {!items ? <Loader /> : items.length === 0 ? <Empty>No {status} deposits.</Empty> : (
           <div className="table-wrap">
             <table className="data">
-              <thead><tr><th>#</th><th>Member</th><th>Amount</th><th>Tx hash</th><th>Status</th><th>Date</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th>Member</th><th>Network</th><th>Amount</th><th>Tx hash</th><th>Status</th><th>Date</th><th></th></tr></thead>
               <tbody>
                 {items.map((d) => (
                   <tr key={d.id}>
@@ -176,6 +182,7 @@ export default function AdminDeposits() {
                       <div>{d.name}</div>
                       <div className="muted" style={{ fontSize: '.8rem' }}>{d.email}</div>
                     </td>
+                    <td><span className="badge cyan">{d.deposit_network || 'TRC20'}</span></td>
                     <td className="mono">{money(d.amount)}</td>
                     <td className="mono muted" style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {d.tx_hash ? (
@@ -190,10 +197,15 @@ export default function AdminDeposits() {
                     <td>
                       {d.status === 'pending' && (
                         <div className="row" style={{ gap: 6 }}>
-                          {d.tx_hash && (
+                          {d.tx_hash && (d.deposit_network || 'TRC20') === 'TRC20' && !d.pay_address && (
                             <button className="btn ghost sm" onClick={() => setVerifyDep(d)} style={{ color: 'var(--cyan, #22d3ee)' }}>
                               Verify
                             </button>
+                          )}
+                          {d.tx_hash && !d.pay_address && (
+                            <a className="btn ghost sm" href={`${TX_EXPLORERS[d.deposit_network || 'TRC20'] || ''}${d.tx_hash}`} target="_blank" rel="noopener noreferrer">
+                              Explorer ↗
+                            </a>
                           )}
                           <button className="btn ok sm" disabled={busyId === d.id} onClick={() => review(d.id, 'confirm')}>Confirm</button>
                           <button className="btn danger sm" disabled={busyId === d.id} onClick={() => review(d.id, 'reject')}>Reject</button>
