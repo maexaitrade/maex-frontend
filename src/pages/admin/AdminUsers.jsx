@@ -31,7 +31,7 @@ function MiniCard({ label, value, color }) {
 // =====================================================================
 // Profile edit form (name / email / phone / wallet)
 // =====================================================================
-function ProfileEditor({ user, userId, onSaved, toast }) {
+function ProfileEditor({ user, userId, onSaved, toast, networkLabel }) {
   const [form, setForm] = useState({ name: user.name || '', email: user.email || '', phone: user.phone || '', wallet_address: user.wallet_address || '' });
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -64,8 +64,10 @@ function ProfileEditor({ user, userId, onSaved, toast }) {
           <input className="input" value={form.phone} onChange={set('phone')} placeholder="optional" style={{ fontSize: '.88rem', padding: '8px 10px' }} />
         </div>
         <div className="field" style={{ margin: 0 }}>
-          <label style={{ fontSize: '.8rem' }}>TRC-20 Wallet Address</label>
-          <input className="input mono" value={form.wallet_address} onChange={set('wallet_address')} placeholder="T…" style={{ fontSize: '.82rem', padding: '8px 10px' }} />
+          <label style={{ fontSize: '.8rem' }}>{networkLabel} Wallet Address</label>
+          <input className="input mono" value={form.wallet_address} onChange={set('wallet_address')}
+            placeholder={networkLabel === 'TRC20' ? 'T…' : networkLabel === 'BEP20' ? '0x…' : 'Solana wallet address'}
+            style={{ fontSize: '.82rem', padding: '8px 10px' }} />
         </div>
       </div>
       <button className="btn primary sm" style={{ marginTop: 12 }} disabled={busy}>
@@ -258,11 +260,12 @@ function HistoryTabs({ investments, deposits, withdrawals, transactions, referra
         <div className="table-wrap">
           {deposits.length === 0 ? <Empty>No deposits.</Empty> : (
             <table className="data compact">
-              <thead><tr><th>#</th><th>Amount</th><th>Status</th><th>From</th><th>Tx Hash</th><th>Date</th></tr></thead>
+              <thead><tr><th>#</th><th>Network</th><th>Amount</th><th>Status</th><th>From</th><th>Tx Hash</th><th>Date</th></tr></thead>
               <tbody>
                 {deposits.map((d) => (
                   <tr key={d.id}>
                     <td className="mono muted">{d.id}</td>
+                    <td><span className="badge cyan">{d.deposit_network || 'TRC20'}</span></td>
                     <td className="mono">{money(d.amount)}</td>
                     <td><Badge status={d.status} /></td>
                     <td className="mono muted" style={{ maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '.78rem' }}>{d.from_address || '—'}</td>
@@ -280,11 +283,12 @@ function HistoryTabs({ investments, deposits, withdrawals, transactions, referra
         <div className="table-wrap">
           {withdrawals.length === 0 ? <Empty>No withdrawals.</Empty> : (
             <table className="data compact">
-              <thead><tr><th>#</th><th>Amount</th><th>Charge</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
+              <thead><tr><th>#</th><th>Network</th><th>Amount</th><th>Charge</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
               <tbody>
                 {withdrawals.map((w) => (
                   <tr key={w.id}>
                     <td className="mono muted">{w.id}</td>
+                    <td><span className="badge cyan">{w.withdrawal_network || 'TRC20'}</span></td>
                     <td className="mono">{money(w.amount)}</td>
                     <td className="mono muted">{money(w.charge)}</td>
                     <td className="mono gradient-text" style={{ fontWeight: 600 }}>{money(w.net_amount)}</td>
@@ -432,6 +436,7 @@ function UserModal({ userId, onClose, onUpdated }) {
               user={user}
               userId={userId}
               toast={toast}
+              networkLabel={data.active_crypto_network_label || data.active_crypto_network || 'TRC20'}
               onSaved={(updated) => setData((d) => ({ ...d, user: { ...d.user, ...updated } }))}
             />
             <div style={{ marginTop: 20 }}>
