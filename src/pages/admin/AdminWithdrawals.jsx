@@ -3,6 +3,12 @@ import { api } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 import { Loader, Empty, Badge, money } from '../../components/ui';
 
+const TX_EXPLORERS = {
+  TRC20: 'https://tronscan.org/#/transaction/',
+  BEP20: 'https://bscscan.com/tx/',
+  SPL: 'https://solscan.io/tx/',
+};
+
 function CopyBtn({ text, toast, label = 'address' }) {
   const [done, setDone] = useState(false);
   async function copy(e) {
@@ -27,6 +33,7 @@ function PayModal({ item, onClose, onDone }) {
   const toast = useToast();
   const [txHash, setTxHash] = useState('');
   const [busy, setBusy] = useState(false);
+  const network = item.withdrawal_network || 'TRC20';
 
   async function submit(e) {
     e.preventDefault();
@@ -53,6 +60,10 @@ function PayModal({ item, onClose, onDone }) {
             <span className="muted">Email</span>
             <span style={{ fontSize: '.85rem' }}>{item.email}</span>
           </div>
+          <div className="between">
+            <span className="muted">Network</span>
+            <span className="badge cyan">{network}</span>
+          </div>
           {item.phone && (
             <div className="between">
               <span className="muted">Phone</span>
@@ -75,7 +86,7 @@ function PayModal({ item, onClose, onDone }) {
 
         <div className="field" style={{ marginBottom: 14 }}>
           <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>TRC-20 wallet address</span>
+            <span>{network} wallet address</span>
             <CopyBtn text={item.wallet_address} toast={toast} label="address" />
           </label>
           <div className="input mono" style={{ fontSize: '.82rem', wordBreak: 'break-all', userSelect: 'all', background: 'rgba(255,255,255,.04)', cursor: 'text' }}>
@@ -86,7 +97,7 @@ function PayModal({ item, onClose, onDone }) {
         <form onSubmit={submit} className="grid" style={{ gap: 10 }}>
           <div className="field">
             <label>Transaction hash <span className="muted">(optional)</span></label>
-            <input className="input mono" placeholder="TRC-20 tx hash…" value={txHash} onChange={(e) => setTxHash(e.target.value)} />
+            <input className="input mono" placeholder={`${network} tx hash…`} value={txHash} onChange={(e) => setTxHash(e.target.value)} />
           </div>
           <div className="row" style={{ gap: 10 }}>
             <button type="button" className="btn ghost" onClick={onClose}>Cancel</button>
@@ -149,8 +160,8 @@ export default function AdminWithdrawals() {
             <table className="data">
               <thead>
                 <tr>
-                  <th>#</th><th>Member</th><th>Amount</th><th>Net</th>
-                  <th className="hide-sm">TRC-20 Address</th>
+                  <th>#</th><th>Member</th><th>Network</th><th>Amount</th><th>Net</th>
+                  <th className="hide-sm">Wallet Address</th>
                   <th>Status</th><th>Date</th><th></th>
                 </tr>
               </thead>
@@ -162,6 +173,7 @@ export default function AdminWithdrawals() {
                       <div style={{ fontWeight: 500 }}>{w.name}</div>
                       <div className="muted" style={{ fontSize: '.8rem' }}>{w.email}</div>
                     </td>
+                    <td><span className="badge cyan">{w.withdrawal_network || 'TRC20'}</span></td>
                     <td className="mono">{money(w.amount)}</td>
                     <td className="mono gradient-text" style={{ fontWeight: 600 }}>{money(w.net_amount)}</td>
                     <td className="hide-sm">
@@ -179,7 +191,10 @@ export default function AdminWithdrawals() {
                           <button className="btn danger sm" disabled={busyId === w.id} onClick={() => reject(w.id)}>Reject</button>
                         </div>
                       )}
-                      {w.tx_hash && <span className="mono muted" style={{ fontSize: '.75rem' }} title={w.tx_hash}>tx…</span>}
+                      {w.tx_hash && (
+                        <a className="mono muted" style={{ fontSize: '.75rem' }} title={w.tx_hash}
+                          href={`${TX_EXPLORERS[w.withdrawal_network || 'TRC20'] || ''}${w.tx_hash}`} target="_blank" rel="noopener noreferrer">tx↗</a>
+                      )}
                     </td>
                   </tr>
                 ))}
